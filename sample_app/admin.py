@@ -5,7 +5,7 @@ from sample_app.models import *
 
 @admin.register(Author)
 class AuthorAdmin(admin.ModelAdmin):
-    
+
     empty_value_display = 'Unknown'
     list_display = ('name','createdDate','updatedDate',)
 
@@ -29,5 +29,12 @@ class QuestionAdmin(admin.ModelAdmin):
 
     date_hierarchy = 'pub_date'
 
+    list_filter = ('refAuthor',)
 
-admin.site.register(Choice)
+
+@admin.register(Choice)
+class ChoiceAdmin(admin.ModelAdmin):
+    list_display = ('question', 'choice_text','votes','createdDate', 'updatedDate',)
+    list_filter = ('question__refAuthor','question',)
+    ordering = ('-createdDate',)
+    search_fields=('choice_text','question__refAuthor__name','question__question_text')
