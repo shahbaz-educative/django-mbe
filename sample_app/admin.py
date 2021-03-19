@@ -9,6 +9,8 @@ class AuthorAdmin(admin.ModelAdmin):
     empty_value_display = 'Unknown'
     list_display = ('name','createdDate','updatedDate',)
 
+    search_fields = ('name',)
+
 
 @admin.register(Question)
 class QuestionAdmin(admin.ModelAdmin):
@@ -31,6 +33,12 @@ class QuestionAdmin(admin.ModelAdmin):
 
     list_filter = ('refAuthor',)
 
+    list_select_related = ('refAuthor',)
+
+    # autocomplete_fields = ['refAuthor']
+    
+    raw_id_fields = ('refAuthor', )
+
 
 @admin.register(Choice)
 class ChoiceAdmin(admin.ModelAdmin):
@@ -38,3 +46,5 @@ class ChoiceAdmin(admin.ModelAdmin):
     list_filter = ('question__refAuthor','question',)
     ordering = ('-createdDate',)
     search_fields=('choice_text','question__refAuthor__name','question__question_text')
+
+    list_select_related = ('question','question__refAuthor',)
