@@ -40,13 +40,30 @@ class QuestionPublishedListFilter(admin.SimpleListFilter):
             return queryset.filter(pub_date__gte=datetime.now())
 
 
+class QuestionInline(admin.StackedInline):
+    model = Question
 
 @admin.register(Author)
 class AuthorAdmin(admin.ModelAdmin):
 
     empty_value_display = 'Unknown'
     list_display = ('name','createdDate','updatedDate',)
+    fieldsets = [
+        ("Author information", {'fields': ['name','createdDate','updatedDate']}),
+        ]
+
+    def save_model(self, request, obj, form, change):
+        print("Author saved by user %s" %request.user)
+        super().save_model(request, obj, form, change)
+
+    def get_queryset(self, request):
+        qs = super(AuthorAdmin, self).get_queryset(request)
+        return qs.filter(name__startswith='j')
+
+    readonly_fields = ('createdDate','updatedDate',)
+
     search_fields = ('name',)
+    inlines = [QuestionInline,]
 
 
 @admin.register(Question)
@@ -60,11 +77,18 @@ class QuestionAdmin(admin.ModelAdmin):
         ('The author', {'classes': ('collapse',),'fields': ('refAuthor',),}),
     )
 
-    list_display = ('question_text', 'goToChoices', 'refAuthor', 'has_been_published', 'pub_date', 
+    list_display = ('question_text', 'my_question_text', 'goToChoices', 'refAuthor', 'has_been_published', 'pub_date', 
                     'createdDate', 'updatedDate',)
 
-    list_display_links = ('refAuthor',)
-    list_editable = ('question_text',)
+    list_display_links = ('question_text','refAuthor',)
+    # list_editable = ('question_text',)
+
+    list_per_page = 50
+
+    def my_question_text(self, obj):
+        return obj.question_text
+
+    my_question_text.empty_value_display = '???'
 
     def has_been_published(self, obj):
         present = datetime.now()

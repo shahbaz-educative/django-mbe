@@ -13,7 +13,7 @@ class Author(models.Model):
 
 
 class Question(models.Model):
-    question_text = models.CharField(max_length=200)
+    question_text = models.CharField(max_length=200, null=True, blank=True)
     pub_date = models.DateTimeField('date published')
     refAuthor = models.ForeignKey(Author, on_delete=models.CASCADE)
     createdDate = models.DateTimeField(auto_now_add=True)
