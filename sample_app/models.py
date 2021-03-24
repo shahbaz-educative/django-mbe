@@ -37,3 +37,15 @@ class Choice(models.Model):
 
     def __str__(self):
         return u'%s : %s' % (self.question, self.choice_text)
+
+class AuthorClone(Author):
+    class Meta:
+        proxy=True
+        verbose_name_plural = "The Authors clone"
+
+# class QuestionSummary(models.Model):
+# 	month = models.DateField()
+# 	nbQuestionsByMonth = models.IntegerField()
+# 	class Meta:
+# 		managed = False
+# 		db_table = 'app_questionsummary'
