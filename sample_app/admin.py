@@ -5,6 +5,21 @@ from datetime import datetime, timedelta
 from django.utils.html import format_html
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
+from django.contrib.auth.models import User, Group
+from django.contrib.admin import AdminSite
+
+# admin.site.unregister(User)
+# admin.site.unregister(Group)
+
+
+# Custom admin site
+class MyUltimateAdminSite(AdminSite):
+	site_header = 'My Django Admin Ultimate Guide'
+	site_title = 'My Django Admin Ultimate Guide Administration'
+	index_title = 'Welcome to "sample_app"'
+
+site = MyUltimateAdminSite()
+
 
 # admin.site.empty_value_display = '(No value)'
 
@@ -43,7 +58,7 @@ class QuestionPublishedListFilter(admin.SimpleListFilter):
 class QuestionInline(admin.StackedInline):
     model = Question
 
-@admin.register(Author)
+# @admin.register(Author)
 class AuthorAdmin(admin.ModelAdmin):
 
     empty_value_display = 'Unknown'
@@ -66,7 +81,7 @@ class AuthorAdmin(admin.ModelAdmin):
     inlines = [QuestionInline,]
 
 
-@admin.register(Question)
+# @admin.register(Question)
 class QuestionAdmin(admin.ModelAdmin):
 
     save_on_top = True
@@ -164,7 +179,7 @@ class QuestionAdmin(admin.ModelAdmin):
     raw_id_fields = ('refAuthor', )
 
 
-@admin.register(Choice)
+# @admin.register(Choice)
 class ChoiceAdmin(admin.ModelAdmin):
     list_display = ('question', 'choice_text','votes','createdDate', 'updatedDate',)
     list_filter = ('question__refAuthor','question',)
@@ -174,7 +189,7 @@ class ChoiceAdmin(admin.ModelAdmin):
     list_select_related = ('question','question__refAuthor',)
 
 
-@admin.register(AuthorClone)
+# @admin.register(AuthorClone)
 class AuthorCloneAdmin(admin.ModelAdmin):
     fieldsets = [
         ("Author information", {'fields': ['name','createdDate','updatedDate']}),
@@ -185,3 +200,10 @@ class AuthorCloneAdmin(admin.ModelAdmin):
 # @admin.register(QuestionSummary)
 # class QuestionSummaryAdmin(admin.ModelAdmin):
 #     pass
+
+
+site.register(Author, AuthorAdmin)
+site.register(Question,QuestionAdmin)
+site.register(Choice,ChoiceAdmin)
+site.register(Group)
+site.register(User)
