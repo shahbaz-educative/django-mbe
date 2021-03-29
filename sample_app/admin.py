@@ -66,29 +66,40 @@ class QuestionInline(admin.StackedInline):
 # @admin.register(Author)
 class AuthorAdmin(admin.ModelAdmin):
 
+    ## change_list.html
+    # def changelist_view(self, request, extra_context=None):
+    #     # Aggregate new authors per day
+    #     chart_data = (
+    # 	    Author.objects.annotate(date=TruncDay("updatedDate"))
+    #         .values("date")
+    #         .annotate(y=Count("id"))
+    #         .order_by("-date")
+    #     )
 
-    def changelist_view(self, request, extra_context=None):
-        # Aggregate new authors per day
-        chart_data = (
-    	    Author.objects.annotate(date=TruncDay("updatedDate"))
-            .values("date")
-            .annotate(y=Count("id"))
-            .order_by("-date")
-        )
-
-        # Serialize and attach the chart data to the template context
-        as_json = json.dumps(list(chart_data), cls=DjangoJSONEncoder)
-        print("Json %s"%as_json)
-        extra_context = extra_context or {"chart_data": as_json}
-        # Call the superclass changelist_view to render the page
+    #     # Serialize and attach the chart data to the template context
+    #     as_json = json.dumps(list(chart_data), cls=DjangoJSONEncoder)
+    #     print("Json %s"%as_json)
+    #     extra_context = extra_context or {"chart_data": as_json}
+    #     # Call the superclass changelist_view to render the page
         
-        return super().changelist_view(request, extra_context=extra_context)
+    #     return super().changelist_view(request, extra_context=extra_context)
 
-    empty_value_display = 'Unknown'
-    list_display = ('name','createdDate','updatedDate',)
-    fieldsets = [
-        ("Author information", {'fields': ['name','createdDate','updatedDate']}),
-        ]
+    # empty_value_display = 'Unknown'
+    # list_display = ('name','createdDate','updatedDate',)
+    # fieldsets = [
+    #     ("Author information", {'fields': ['name','createdDate','updatedDate']}),
+    #     ]
+
+    ## change_form.html
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        nbQuestion = Question.objects.filter(refAuthor=object_id).count()
+        response_data = [nbQuestion]
+        extra_context = extra_context or {}
+
+	    # Serialize and attach the chart data to the template context
+        as_json = json.dumps(response_data, cls=DjangoJSONEncoder)
+        extra_context = extra_context or {"nbQuestion": as_json}
+        return super().change_view(request, object_id, form_url, extra_context=extra_context,)
 
     def save_model(self, request, obj, form, change):
         print("Author saved by user %s" %request.user)
