@@ -19,9 +19,21 @@ import json
 
 # Custom admin site
 class MyUltimateAdminSite(AdminSite):
-	site_header = 'My Django Admin Ultimate Guide'
-	site_title = 'My Django Admin Ultimate Guide Administration'
-	index_title = 'Welcome to "sample_app"'
+    site_header = 'My Django Admin Ultimate Guide'
+    site_title = 'My Django Admin Ultimate Guide Administration'
+    index_title = 'Welcome to "sample_app"'
+    index_template = 'sample_app/templates/admin/my_index.html'
+    login_template = 'sample_app/templates/admin/login.html'
+    
+    def get_app_list(self,request):
+        #Return a sorted list of our models  
+        ordering = {"The Choices": 1, "The Questions": 2, "The Authors": 3, "The Authors clone": 4}
+        app_dict = self._build_app_dict(request)
+        app_list = sorted(app_dict.values(), key=lambda x: x['name'].lower())
+        # for app in app_list:
+        #     app['models'].sort(key=lambda x: ordering[x['name']])
+        return app_list
+
 
 site = MyUltimateAdminSite()
 
@@ -67,28 +79,28 @@ class QuestionInline(admin.StackedInline):
 class AuthorAdmin(admin.ModelAdmin):
 
     ## change_list.html
-    # def changelist_view(self, request, extra_context=None):
-    #     # Aggregate new authors per day
-    #     chart_data = (
-    # 	    Author.objects.annotate(date=TruncDay("updatedDate"))
-    #         .values("date")
-    #         .annotate(y=Count("id"))
-    #         .order_by("-date")
-    #     )
+    def changelist_view(self, request, extra_context=None):
+        # Aggregate new authors per day
+        chart_data = (
+    	    Author.objects.annotate(date=TruncDay("updatedDate"))
+            .values("date")
+            .annotate(y=Count("id"))
+            .order_by("-date")
+        )
 
-    #     # Serialize and attach the chart data to the template context
-    #     as_json = json.dumps(list(chart_data), cls=DjangoJSONEncoder)
-    #     print("Json %s"%as_json)
-    #     extra_context = extra_context or {"chart_data": as_json}
-    #     # Call the superclass changelist_view to render the page
+        # Serialize and attach the chart data to the template context
+        as_json = json.dumps(list(chart_data), cls=DjangoJSONEncoder)
+        print("Json %s"%as_json)
+        extra_context = extra_context or {"chart_data": as_json}
+        # Call the superclass changelist_view to render the page
         
-    #     return super().changelist_view(request, extra_context=extra_context)
+        return super().changelist_view(request, extra_context=extra_context)
 
-    # empty_value_display = 'Unknown'
-    # list_display = ('name','createdDate','updatedDate',)
-    # fieldsets = [
-    #     ("Author information", {'fields': ['name','createdDate','updatedDate']}),
-    #     ]
+    empty_value_display = 'Unknown'
+    list_display = ('name','createdDate','updatedDate',)
+    fieldsets = [
+        ("Author information", {'fields': ['name','createdDate','updatedDate']}),
+        ]
 
     ## change_form.html
     def change_view(self, request, object_id, form_url='', extra_context=None):
@@ -239,5 +251,6 @@ class AuthorCloneAdmin(admin.ModelAdmin):
 site.register(Author, AuthorAdmin)
 site.register(Question,QuestionAdmin)
 site.register(Choice,ChoiceAdmin)
+site.register(AuthorClone, AuthorCloneAdmin)
 site.register(Group)
 site.register(User)
