@@ -21,7 +21,7 @@ import json
 class MyUltimateAdminSite(AdminSite):
     site_header = 'My Django Admin Ultimate Guide'
     site_title = 'My Django Admin Ultimate Guide Administration'
-    index_title = 'Welcome to "sample_app"'
+    index_title = 'Welcome to sample_app'
     index_template = 'sample_app/templates/admin/my_index.html'
     login_template = 'sample_app/templates/admin/login.html'
     
