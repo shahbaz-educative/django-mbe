@@ -132,6 +132,8 @@ class QuestionAdmin(admin.ModelAdmin):
 
     save_on_top = True
 
+    search_fields = ('refAuthor__name',)
+
     fieldsets = (
         ("Question information", {'fields': ('question_text',)}),
         ("Date", {'fields': ('pub_date',)}),
