@@ -10,12 +10,8 @@ from django.contrib.admin import AdminSite
 from django.db.models.functions import TruncDay
 from django.db.models import Count
 from django.core.serializers.json import DjangoJSONEncoder
+from django.urls import path
 import json
-
-
-# admin.site.unregister(User)
-# admin.site.unregister(Group)
-
 
 # Custom admin site
 class MyUltimateAdminSite(AdminSite):
@@ -25,6 +21,15 @@ class MyUltimateAdminSite(AdminSite):
     index_template = 'sample_app/templates/admin/my_index.html'
     login_template = 'sample_app/templates/admin/login.html'
     
+
+    def get_urls(self):
+        urls = super(MyUltimateAdminSite, self).get_urls()
+        custom_urls = [
+            path('my_view/', self.admin_view(self.my_view), name="my_view"),
+        ]
+        return urls + custom_urls
+
+
     def get_app_list(self,request):
         #Return a sorted list of our models  
         ordering = {"The Choices": 1, "The Questions": 2, "The Authors": 3, "The Authors clone": 4}
@@ -33,6 +38,14 @@ class MyUltimateAdminSite(AdminSite):
         # for app in app_list:
         #     app['models'].sort(key=lambda x: ordering[x['name']])
         return app_list
+    
+    def my_view(self, request):
+        # your business code
+        context = dict(
+        self.each_context(request),
+            welcome="Welcome to the new view",
+        )
+        return TemplateResponse(request, "admin/sample_app/custom_view.html", context)
 
 
 site = MyUltimateAdminSite()
